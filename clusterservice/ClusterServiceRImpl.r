@@ -94,7 +94,7 @@ methods[["ClusterServiceR.estimate_k"]] <- function(matrix, min_k, max_k,
     max_clust_num = min(c(max_k,nrow(values)-1))
     if (!is.null(random_seed))
         set.seed(random_seed)
-    max_items<-c(min(nrow(values),max_items)
+    max_items<-c(min(nrow(values),max_items))
     if (nrow(values) > max_items)
         values<-values[1:max_items,]
     valid <- clValid(values, nClust=c(min_k:max_clust_num), maxitems=max_items, 
