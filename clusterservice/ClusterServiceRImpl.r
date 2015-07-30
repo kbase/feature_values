@@ -84,6 +84,8 @@ methods[["ClusterServiceR.estimate_k"]] <- function(matrix, min_k, max_k,
         max_iter <- 100
     if (is.null(neighb_size))
         neighb_size <- 10
+    if (is.null(max_items))
+        max_items <- nrow(values)
     values <- matrix[["values"]]
     #row_names <- matrix[["row_ids"]]
     row_names <- c(1:length(matrix[["row_ids"]]))-1
@@ -92,10 +94,9 @@ methods[["ClusterServiceR.estimate_k"]] <- function(matrix, min_k, max_k,
     max_clust_num = min(c(max_k,nrow(values)-1))
     if (!is.null(random_seed))
         set.seed(random_seed)
-    if (is.null(max_items))
-        max_items <- 15000
-    if (max_items > nrow(values))
-        max_items <- nrow(values)
+    max_items<-c(min(nrow(values),max_items))
+    if (nrow(values) > max_items)
+        values<-values[1:max_items,]
     valid <- clValid(values, nClust=c(min_k:max_clust_num), maxitems=max_items, 
         clMethods=c("kmeans"),validation=c("internal"), iter.max=max_iter,
         neighbSize=neighb_size)
