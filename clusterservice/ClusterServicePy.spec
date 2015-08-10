@@ -34,6 +34,14 @@ module ClusterServicePy {
         returns (KBaseFeatureValues.EstimateKResult);
 
     /*
+        Used as an analysis step before generating clusters using K-means
+        clustering, this method provides an estimate of K by [...]
+    */
+    funcdef estimate_k_new(KBaseFeatureValues.FloatMatrix2D matrix, int min_k,
+        int max_k, string criterion, boolean usepam, float alpha, boolean diss,int random_seed)
+        returns (KBaseFeatureValues.EstimateKResult);
+
+    /*
         Clusters features by K-means clustering.
     */
     funcdef cluster_k_means(KBaseFeatureValues.FloatMatrix2D matrix,

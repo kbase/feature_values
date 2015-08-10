@@ -83,6 +83,39 @@ public class ClusterServiceRLocalClient extends JsonLocalClientCaller implements
     }
 
     /**
+     * <p>Original spec-file function name: estimate_k_new</p>
+     * <pre>
+     * Used as an analysis step before generating clusters using K-means 
+     * clustering, this method provides an estimate of K by [...]
+     * </pre>
+     * @param   matrix   instance of type {@link us.kbase.kbasefeaturevalues.FloatMatrix2D FloatMatrix2D}
+     * @param   minK   instance of Long
+     * @param   maxK   instance of Long
+     * @param   criterion   instance of String
+     * @param   usepam    instance of Boolean
+     * @param   alpha   instance of Double
+     * @param   diss   instance of Boolean
+     * @param   randomSeed   instance of Long
+     * @return   instance of type {@link us.kbase.kbasefeaturevalues.EstimateKResult EstimateKResult}
+     * @throws IOException if an IO exception occurs
+     * @throws JsonClientException if a JSON RPC exception occurs
+     */
+    public EstimateKResult estimateK_new(FloatMatrix2D matrix, Long minK, Long maxK, String criterion, Boolean usepam, Double alpha, Boolean diss, Long randomSeed) throws IOException, JsonClientException {
+        List<Object> args = new ArrayList<Object>();
+        args.add(matrix);
+        args.add(minK);
+        args.add(maxK);
+        args.add(criterion);
+	args.add(usepam);
+	args.add(alpha);
+	args.add(diss);
+        args.add(randomSeed);
+        TypeReference<List<EstimateKResult>> retType = new TypeReference<List<EstimateKResult>>() {};
+        List<EstimateKResult> res = jsonrpcCall("ClusterServiceR.estimate_k_new", args, retType, true, false);
+        return res.get(0);
+    }
+
+    /**
      * <p>Original spec-file function name: cluster_hierarchical</p>
      * <pre>
      * Clusters features by hierarchical clustering.

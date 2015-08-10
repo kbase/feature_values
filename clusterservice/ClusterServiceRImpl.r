@@ -5,6 +5,8 @@ library(amap)
 #library(sp)
 library(ape)
 library(flashClust)
+library(fpc)
+library(cluster)
 
 mean_m = function(vec){
     vec[as.vector(is.nan(vec))] <- NA
@@ -110,6 +112,36 @@ methods[["ClusterServiceR.estimate_k"]] <- function(matrix, min_k, max_k,
         cluster_count_qualities <- rbind(cluster_count_qualities, list(cluster_count, quality))
     }
     return(list(best_k=unbox(as.numeric(ret_names[best_pos])), estimate_cluster_sizes=cluster_count_qualities))
+}
+methods[["ClusterServiceR.estimate_k_new"]] <- function(matrix, min_k, max_k,
+       crit,usepam,alpha,diss,random_seed) {
+    if (!is.null(random_seed))
+        set.seed(random_seed)
+    if (is.null(min_k))
+        min_k <- 2
+    if (is.null(max_k))
+        max_k <- 200
+    if (is.null(crit))
+        crit <- "asw"
+    if (is.null(usepam))
+        usepam <- FALSE
+    values <- matrix[["values"]]
+    #row_names <- matrix[["row_ids"]]
+    row_names <- c(1:length(matrix[["row_ids"]]))-1
+    row.names(values) <- row_names
+    values <- data.matrix(values)
+    max_clust_num = min(c(max_k,nrow(values)-1))
+    pk<- pamk(values,krange=c(min_k:max_clust_num),criterion=crit,
+        usepam=usepam,ns=10)
+    ret_names <- c(min_k,max_clust_num)
+    best_pos <- pk$nc
+    cluster_count_qualities <- list()
+    for (pos in 1:length(ret_names)) {
+	cluster_count = ret_names[pos]
+        quality <- pk$crit[pos+1]
+        cluster_count_qualities <- rbind(cluster_count_qualities, list(cluster_count, quality))
+    }
+    return(list(best_k=as.numeric(best_pos), estimate_cluster_sizes=cluster_count_qualities))
 }
 
 methods[["ClusterServiceR.cluster_k_means"]] <- function(matrix, k, n_start, 

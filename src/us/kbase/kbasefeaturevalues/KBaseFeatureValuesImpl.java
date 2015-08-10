@@ -121,6 +121,28 @@ public class KBaseFeatureValuesImpl {
         return params.getOutWorkspace() + "/" + params.getOutEstimateResult();
     }
 
+    public String estimateK_new(EstimateKParams_new params) throws Exception {
+        ObjectData objData = getWsClient().getObjects(Arrays.asList(
+                new ObjectIdentity().withRef(params.getInputMatrix()))).get(0);
+        BioMatrix matrix = objData.getData().asClassInstance(BioMatrix.class);
+        ClusterServiceLocalClient mathClient = getMathClient();
+        EstimateKResult toSave = mathClient.estimateK_new(matrix.getData(), params.getMinK(),
+                params.getMaxK(), params.getCriterion(), params.getUsepam(),params.getAlpha(),
+	        params.getDiss(),params.getRandomSeed());
+        List<ProvenanceAction> provenance = Arrays.asList(
+                new ProvenanceAction().withService(KBaseFeatureValuesServer.SERVICE_NAME)
+                .withServiceVer(KBaseFeatureValuesServer.SERVICE_VERSION)
+                .withDescription("K estimation for K-Means clustering method")
+                .withInputWsObjects(Arrays.asList(params.getInputMatrix()))
+                .withMethod("estimate_k_new")
+                .withMethodParams(Arrays.asList(new UObject(params))));
+        getWsClient().saveObjects(new SaveObjectsParams().withWorkspace(params.getOutWorkspace())
+                .withObjects(Arrays.asList(new ObjectSaveData()
+                .withType("KBaseFeatureValues.EstimateKResult").withName(params.getOutEstimateResult())
+                .withData(new UObject(toSave)).withProvenance(provenance))));
+        return params.getOutWorkspace() + "/" + params.getOutEstimateResult();
+    }
+
     public String clusterKMeans(ClusterKMeansParams params) throws Exception {
         ObjectData objData = getWsClient().getObjects(Arrays.asList(
                 new ObjectIdentity().withRef(params.getInputData()))).get(0);

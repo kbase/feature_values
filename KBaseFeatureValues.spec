@@ -231,6 +231,27 @@ module KBaseFeatureValues {
         string out_workspace;
         string out_estimate_result;
     } EstimateKParams;
+   
+     typedef structure {
+        ws_matrix_id input_matrix;
+        int min_k;
+        int max_k;
+        string criterion;
+        boolean usepam;
+	float alpha;
+	boolean diss;
+	int random_seed;
+        string out_workspace;
+        string out_estimate_result;
+    } EstimateKParams_new;
+
+    /*
+        Used as an analysis step before generating clusters using K-means clustering, this method
+        provides an estimate of K by [...]
+    */
+    funcdef estimate_k_new(EstimateKParams_new params)
+        returns (string job_id) authentication required;
+
 
     /*
         Used as an analysis step before generating clusters using K-means clustering, this method
