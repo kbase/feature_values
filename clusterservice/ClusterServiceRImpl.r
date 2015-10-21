@@ -8,6 +8,9 @@ library(flashClust)
 library(fpc)
 library(cluster)
 
+library(WGCNA)
+
+
 mean_m = function(vec){
     vec[as.vector(is.nan(vec))] <- NA
     n <- sum(!is.na(vec))
@@ -177,6 +180,34 @@ methods[["ClusterServiceR.cluster_k_means"]] <- function(matrix, k, n_start,
     km <- kmeans(values, k, iter.max = max_iter, nstart=n_start, algorithm=algorithm_name)
     return(calc_cluster_props(values, km[["cluster"]], list(cluster_labels=km[["cluster"]])))
 }
+
+
+
+methods[["ClusterServiceR.cluster_WGCNA"]] <- function(matrix, 
+        distance_metric) {
+    values <- matrix[["values"]]
+    row_names <- c(1:length(matrix[["row_ids"]]))-1
+    row.names(values) <- row_names
+    process_rows <- 3000
+    if (is.null(process_rows))
+        process_rows<-nrow(matrix[["values"]])
+    original_values <- values
+    values <- data.matrix(topVarGenes(values,process_rows))
+    hcout <- NA
+    dd <- Dist(values, method="correlation")
+    hcout <- flashClust::hclust(dd, method = "complete")
+    
+    phylo <- as.phylo(hcout)
+    phylo$edge.length <- phylo$edge.length * 2 / max(hcout$height)
+    newick <- write.tree(phylo, file = "")
+    #print(is.ultrametric(tree))
+    #print(is.binary.tree(tree))
+    #print(is.rooted(tree))
+    height_cutoff <- 0.65
+    return(clusters_from_dendrogram(original_values, newick, height_cutoff))
+}
+
+
 
 methods[["ClusterServiceR.cluster_hierarchical"]] <- function(matrix, 
         distance_metric, linkage_criteria, height_cutoff,
